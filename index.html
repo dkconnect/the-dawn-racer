@@ -142,11 +142,24 @@
         -webkit-text-fill-color: transparent;
         margin: 0;
       }
-      #text {
+      #startButton {
+        font-family: "Press Start 2P", monospace;
         font-size: 1em;
         color: #d9bbf3;
+        background: -webkit-linear-gradient(#2cd271, #4a0861);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
         text-shadow: 0 0 black, 0 2px black, 2px 0 black, 0 -2px black;
+        border: 2px solid #7dd8c9;
+        border-radius: 6px;
+        padding: 10px 20px;
+        cursor: pointer;
         margin: 20px 0;
+        background-color: rgba(255, 255, 255, 0.1);
+        transition: background-color 0.3s;
+      }
+      #startButton:hover {
+        background-color: rgba(255, 255, 255, 0.3);
       }
       .blink {
         animation: blinker 1s steps(4, end) infinite;
@@ -193,7 +206,7 @@
       @media (max-width: 600px) {
         #game {
           width: 100vw;
-          height: calc(100vw * 5 / 8); 
+          height: calc(100vw * 5 / 8);
         }
         #controls {
           font-size: 11px;
@@ -219,10 +232,10 @@
           padding-left: 10px;
         }
         h1 {
-            font-size: 1.8em;
+          font-size: 1.8em;
         }
-        #text {
-            font-size: 0.8em;
+        #startButton {
+          font-size: 0.8em;
         }
       }
     </style>
@@ -241,12 +254,12 @@
       </div>
       <div id="home">
         <h1>Racing 2D</h1>
-        <p id="text"></p>
+        <button id="startButton" class="blink">Start</button>
         <div id="highscore"></div>
       </div>
     </div>
     <div id="controls">
-      <span><span>C</span>insert coin</span>
+      <span>Click <span>Start</span> to begin</span>
       <span><span>M</span>mute</span>
       <span class="desktop-only"><span>&larr;</span><span>&rarr;</span>move</span>
       <span class="touch-only"><span>Swipe</span>to move</span>
@@ -255,7 +268,6 @@
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
     <script>
-
       window.console = window.console || function (t) {};
 
       if (document.location.search.match(/type=embed/gi)) {
@@ -299,21 +311,20 @@
             src: "Untitled design (28).png",
           },
           CLOUD: {
-              src: "Untitled design (28).png", 
-              width: 1000,
-              height: 500,
+            src: "Untitled design (28).png",
+            width: 1000,
+            height: 500,
           },
-
           BUSH: {
-              src: "360_F_523360686_5yAU20hcv28nqDRYaFZOgjypRyPy0aZy-removebg-preview.png",
-              width: 100,
-              height: 50,
+            src: "360_F_523360686_5yAU20hcv28nqDRYaFZOgjypRyPy0aZy-removebg-preview.png",
+            width: 100,
+            height: 50,
           },
           BILLBOARD: {
-              src: "Large-Format-Billboard-Mockup-2.jpg",
-              width: 200,
-              height: 150,
-          }
+            src: "Large-Format-Billboard-Mockup-2.jpg",
+            width: 200,
+            height: 150,
+          },
         },
         AUDIO: {
           theme: "https://s3-us-west-2.amazonaws.com/s.cdpn.io/155629/theme.mp3",
@@ -388,38 +399,50 @@
       let isTouching = false;
       const gameDiv = document.getElementById("game");
 
-      gameDiv.addEventListener("touchstart", (e) => {
-        touchStartX = e.touches[0].clientX;
-        isTouching = true;
-        KEYS.ArrowUp = true;
-        e.preventDefault();
-      }, { passive: false });
+      gameDiv.addEventListener(
+        "touchstart",
+        (e) => {
+          touchStartX = e.touches[0].clientX;
+          isTouching = true;
+          KEYS.ArrowUp = true;
+          e.preventDefault();
+        },
+        { passive: false }
+      );
 
-      gameDiv.addEventListener("touchmove", (e) => {
-        if (isTouching) {
-          touchDeltaX = e.touches[0].clientX - touchStartX;
-          if (touchDeltaX > 20) {
-            KEYS.ArrowRight = true;
-            KEYS.ArrowLeft = false;
-          } else if (touchDeltaX < -20) {
-            KEYS.ArrowLeft = true;
-            KEYS.ArrowRight = false;
-          } else {
-            KEYS.ArrowLeft = false;
-            KEYS.ArrowRight = false;
+      gameDiv.addEventListener(
+        "touchmove",
+        (e) => {
+          if (isTouching) {
+            touchDeltaX = e.touches[0].clientX - touchStartX;
+            if (touchDeltaX > 20) {
+              KEYS.ArrowRight = true;
+              KEYS.ArrowLeft = false;
+            } else if (touchDeltaX < -20) {
+              KEYS.ArrowLeft = true;
+              KEYS.ArrowRight = false;
+            } else {
+              KEYS.ArrowLeft = false;
+              KEYS.ArrowRight = false;
+            }
           }
-        }
-        e.preventDefault();
-      }, { passive: false });
+          e.preventDefault();
+        },
+        { passive: false }
+      );
 
-      gameDiv.addEventListener("touchend", (e) => {
-        isTouching = false;
-        touchDeltaX = 0;
-        KEYS.ArrowUp = false;
-        KEYS.ArrowLeft = false;
-        KEYS.ArrowRight = false;
-        e.preventDefault();
-      }, { passive: false });
+      gameDiv.addEventListener(
+        "touchend",
+        (e) => {
+          isTouching = false;
+          touchDeltaX = 0;
+          KEYS.ArrowUp = false;
+          KEYS.ArrowLeft = false;
+          KEYS.ArrowRight = false;
+          e.preventDefault();
+        },
+        { passive: false }
+      );
 
       class Line {
         constructor() {
@@ -504,7 +527,7 @@
       };
       const mapLength = 15000;
       let then = timestamp();
-      const targetFrameRate = 1000 / 25; 
+      const targetFrameRate = 1000 / 25;
       let inGame,
         start,
         playerX,
@@ -518,10 +541,10 @@
       let lines = [];
       let cars = [];
       const SCENERY_OBJECTS = [
-          ASSETS.IMAGE.TREE1,
-          ASSETS.IMAGE.TREE2,
-          ASSETS.IMAGE.BUSH,
-          ASSETS.IMAGE.BILLBOARD
+        ASSETS.IMAGE.TREE1,
+        ASSETS.IMAGE.TREE2,
+        ASSETS.IMAGE.BUSH,
+        ASSETS.IMAGE.BILLBOARD,
       ];
 
       function getFun(val) {
@@ -588,37 +611,6 @@
           return;
         }
 
-        if (e.code === "KeyC") {
-          e.preventDefault();
-          if (inGame) return;
-          Tone.start();
-
-          sleep(0)
-            .then((_) => {
-              text.classList.remove("blink");
-              text.innerText = 3;
-              ASSETS.AUDIO.beep.triggerAttackRelease("C4", "8n");
-              return sleep(1000);
-            })
-            .then((_) => {
-              text.innerText = 2;
-              ASSETS.AUDIO.beep.triggerAttackRelease("C4", "8n");
-              return sleep(1000);
-            })
-            .then((_) => {
-              reset();
-              home.style.display = "none";
-              road.style.opacity = 1;
-              hero.style.display = "block";
-              hud.style.display = "block";
-              ASSETS.AUDIO.beep.triggerAttackRelease("E4", "8n");
-              Tone.getTransport().start();
-              inGame = true;
-            });
-
-          return;
-        }
-
         if (e.code === "Escape") {
           e.preventDefault();
           reset();
@@ -649,7 +641,8 @@
 
         playerX = playerX.clamp(-3, 3);
 
-        if (inGame && (KEYS.ArrowUp || isTouching)) speed = accelerate(speed, accel, step);
+        if (inGame && (KEYS.ArrowUp || isTouching))
+          speed = accelerate(speed, accel, step);
         else if (KEYS.ArrowDown) speed = accelerate(speed, breaking, step);
         else speed = accelerate(speed, decel, step);
 
@@ -667,7 +660,7 @@
         lines[endPos].special = null;
         lines[endPos].sceneryObject = null;
 
-        if(getRand(0, 10) > 8){
+        if (getRand(0, 10) > 8) {
           lines[endPos].sceneryObject = randomProperty(SCENERY_OBJECTS);
           lines[endPos].sceneryOffset = Math.random() > 0.5 ? -2 : 1.3;
         }
@@ -686,7 +679,9 @@
           tacho.style.display = "none";
           home.style.display = "block";
           road.style.opacity = 0.4;
-          text.innerText = "INSERT COIN";
+          const startButton = document.getElementById("startButton");
+          startButton.innerText = "Start";
+          startButton.classList.add("blink");
           highscores.push(lap.innerText);
           highscores.sort();
           updateHighscore();
@@ -697,17 +692,22 @@
           tacho.innerText = speed | 0;
 
           let cT = new Date(timestamp() - start);
-          lap.innerText = `${cT.getMinutes()}'${cT.getSeconds().pad(2)}"${cT.getMilliseconds().pad(3)}`;
+          lap.innerText = `${cT.getMinutes()}'${cT.getSeconds().pad(2)}"${cT
+            .getMilliseconds()
+            .pad(3)}`;
 
           if (speed > 0) {
             ASSETS.AUDIO.engine.frequency.value = 100 + speed * 2;
-            if (ASSETS.AUDIO.engine.state !== "started") ASSETS.AUDIO.engine.start();
+            if (ASSETS.AUDIO.engine.state !== "started")
+              ASSETS.AUDIO.engine.start();
           } else {
             ASSETS.AUDIO.engine.stop();
           }
         }
 
-        cloud.style.backgroundPosition = `${(cloudOffset -= lines[startPos].curve * step * speed * 0.13) | 0}px 0`;
+        cloud.style.backgroundPosition = `${
+          (cloudOffset -= lines[startPos].curve * step * speed * 0.13) | 0
+        }px 0`;
 
         for (let car of cars) {
           car.pos = (car.pos + enemy_speed * step) % N;
@@ -736,14 +736,18 @@
           let l = lines[n % N];
           let level = N * 2 - n;
 
-          l.project(playerX * roadW - x, camH, startPos * segL - (n >= N ? N * segL : 0));
+          l.project(
+            playerX * roadW - x,
+            camH,
+            startPos * segL - (n >= N ? N * segL : 0)
+          );
           x += dx;
           dx += l.curve;
 
           l.clearSprites();
 
           if (l.sceneryObject) {
-             l.drawSprite(level, 0, l.sceneryObject, l.sceneryOffset);
+            l.drawSprite(level, 0, l.sceneryObject, l.sceneryOffset);
           }
 
           if (l.special) l.drawSprite(level, 0, l.special, l.special.offset || 0);
@@ -839,8 +843,9 @@
 
         for (let line of lines) line.curve = line.y = 0;
 
-        text.innerText = "INSERT COIN";
-        text.classList.add("blink");
+        const startButton = document.getElementById("startButton");
+        startButton.innerText = "Start";
+        startButton.classList.add("blink");
         road.style.opacity = 0.4;
         hud.style.display = "none";
         home.style.display = "block";
@@ -850,7 +855,10 @@
       function updateHighscore() {
         let hN = Math.min(12, highscores.length);
         for (let i = 0; i < hN; i++) {
-          highscore.children[i].innerHTML = `${(i + 1).pad(2, "&nbsp;")}. ${highscores[i]}`;
+          highscore.children[i].innerHTML = `${(i + 1).pad(
+            2,
+            "&nbsp;"
+          )}. ${highscores[i]}`;
         }
       }
 
@@ -889,6 +897,42 @@
         }
         updateHighscore();
 
+        document.getElementById("startButton").addEventListener("click", function () {
+          if (inGame) return;
+          Tone.start();
+
+          const startButton = document.getElementById("startButton");
+          startButton.classList.remove("blink");
+          startButton.innerText = "3";
+
+          sleep(0)
+            .then((_) => {
+              startButton.innerText = "3";
+              ASSETS.AUDIO.beep.triggerAttackRelease("C4", "8n");
+              return sleep(1000);
+            })
+            .then((_) => {
+              startButton.innerText = "2";
+              ASSETS.AUDIO.beep.triggerAttackRelease("C4", "8n");
+              return sleep(1000);
+            })
+            .then((_) => {
+              startButton.innerText = "1";
+              ASSETS.AUDIO.beep.triggerAttackRelease("C4", "8n");
+              return sleep(1000);
+            })
+            .then((_) => {
+              reset();
+              home.style.display = "none";
+              road.style.opacity = 1;
+              hero.style.display = "block";
+              hud.style.display = "block";
+              ASSETS.AUDIO.beep.triggerAttackRelease("E4", "8n");
+              Tone.getTransport().start();
+              inGame = true;
+            });
+        });
+
         reset();
 
         (function loop() {
@@ -902,7 +946,7 @@
         })();
       }
 
-      window.addEventListener('load', init);
+      window.addEventListener("load", init);
     </script>
   </body>
 </html>
